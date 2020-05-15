@@ -1,0 +1,104 @@
+To run the code:
+-------------------
+
+1. Go to project folder in terminal.
+
+2. Use "make clean" command to remove old .o files in case compiled previously
+
+3. Use "make" command to compile the program
+
+4. Use "./test_assign4_1" to run the test in "test_assign4_1.c" file
+
+
+Included files: 
+btree_mgr.h
+buffer_mgr.h
+dberror.h
+expr.h
+record_mgr.h
+storage_mgr.h
+tables.h
+
+Function descriptions:
+
+readTreeInfoNode(BM_PageHandle *nodePage)
+reads the info node into the BT_BtreeInfoNode for easier access
+
+readTreeNodePage(BM_PageHandle *nodePage)
+reads a node into the BT_BtreeNode for easier access
+
+initializeNewNode(BT_BtreeNode *node, int selfIdx)
+initialize the value in a newly created node
+
+readKeyValue(char *keyPtr, DataType keyType)
+converts the key from a char string to a Value
+
+writeKeyValue(char *keyPtr, Value *key, DataType keyType, int keySize)
+writes the Value to the given location
+
+lowerBoundIdx(BT_BtreeInfoNode *infoNode, BT_BtreeNode *node, Value *key)
+finds the index of the first key value greater than given key value
+
+findLeafNodeForKey(BTreeHandle *tree, Value *key) 
+finds the index of a leaf node in which the given key belongs
+
+splitNode(BT_BtreeInfoNode *infoNode, BT_BtreeNode *leftSibling, BT_BtreeNode *rightSibling)
+splits leftSibling into 2 parts and join them as siblings
+
+shiftKeysAndPointers(BT_BtreeInfoNode *infoNode, BT_BtreeNode *node, int startIdx, int shiftCount)
+moves keys and pointers to the right by shiftCount starting from startIdx
+
+insertKeyAndIndexIntoNode(BT_BtreeInfoNode *infoNode, BT_BtreeNode *node, Value *key, void *value)
+inserts the given key into a leaf along with the rid
+
+initIndexManager (void *mgmtData)
+initialize index manager.
+
+shutdownIndexManager ()
+Close index manager and free resources.
+
+createBtree (char *idxId, DataType keyType, int n)
+create a new tree, with the name idxId, data type and the number in each node
+
+openBtree (BTreeHandle **tree, char *idxId)
+Open an existing tree.
+
+closeBtree (BTreeHandle *tree)
+Close a tree and free resources.
+
+deleteBtree (char *idxId)
+Delete a tree from disk.
+
+getNumNodes (BTreeHandle *tree, int *result)
+Get number of nodes from a tree.
+
+getNumEntries (BTreeHandle *tree, int *result)
+Get number of entries from a tree.
+
+getKeyType (BTreeHandle *tree, DataType *result)
+Get Key Type of a tree.
+
+findKey (BTreeHandle *tree, Value *key, RID *result)
+Find a key in tree and return the RID result.
+
+insertKey (BTreeHandle *tree, Value *key, RID rid)
+Insert a key into a tree.
+
+deleteKey (BTreeHandle *tree, Value *key)
+Delete a key from a tree.
+
+openTreeScan (BTreeHandle *tree, BT_ScanHandle **handle)
+Initialize the scan handle and prepare for scan.
+
+nextEntry (BT_ScanHandle *handle, RID *result)
+Get the next entry during scanning.
+
+closeTreeScan (BT_ScanHandle *handle)
+Close the scan handle and free resources.
+
+dfs(BTreeHandle *tree, BT_BtreeNode *curNode, int *idx)
+pre-order traverse the tree and assign positions to tree nodes.
+
+printTree (BTreeHandle *tree)
+print the tree in the format
+

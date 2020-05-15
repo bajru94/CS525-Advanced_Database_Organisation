@@ -1,0 +1,87 @@
+The goal of assignment 3 is to implement a simple record manager to process tables with fixed schema so that it supports insert, delete, update, and scan of records. The scan is associated with the search criteria and only returns records that match the search criteria. Each table will be stored in a separate page file, and the record manager will access the file's page through the buffer manager implemented.
+
+How to run the code：
+1. Go to project folder in terminal.
+2. Use "make clean" command to remove old .o files in case compiled previously
+3. Use "make" command to compile the program
+   Use "./test_assign3_1" to run the default tests
+
+   Use "./test_assign3_2" to run the "Check primary key constraints" optional extension tests in "test_assign3_2.c" file
+
+   Use "./test_assign3_3" to run the "Conditional updates using scans" optional extension tests in "test_assign3_3.c" file
+
+------------------
+functions:
+
+initRecordManager (void *mgmtData)
+This function initializes the record manager.
+
+shutdownRecordManager()
+This function shuts down the record manager.
+
+createTable(char *name, Schema *schema)
+This function is used to create a table, with the input table name and schema declared. we create a new page and pin it to the buffer manager. We store all the schema information to this page and mark this page as dirty. Then we call the shutdownBufferPool to enforce the buffer manager write all these information back to the disk file.
+
+RC openTable(RM_TableData *rel, char *name)
+This function opens the file with given table name. It initializes the buffer manager with given filename and loads the tableInfo and schema into memory.
+
+closeTable(RM_TableData *rel)
+Frees all the resources assigned with table.
+
+getNumTuples(RM_TableData *rel)
+This function is used to retrieve the number of tuples stored in the table, we can directly get it from the tableInfo.
+
+insertRecord(RM_TableData *rel, Record *record)
+This function is used to insert one record into the table. Firstly we check if there is space in all the pages, if all pages are full, we need to add another page, otherwise we find a page with an empty slot for the record by loopping through all the pages. The functions pinPage, markDirty, unpinPage, and freeare then used to update the buffer pool, the number of records are increased, and the resulting table is written to file.
+
+deleteRecord(RM_TableData *rel, RID id)
+This function is used to delete one record from the table.
+
+updateRecord(RM_TableData *rel, Record *record)
+This function updates the record in the table according to the parameter record. We firstly find the record to be updated based on the RID info stored in record, then copy parameter record's data filed to the space in the page and update the desired record's data.
+
+getRecord(RM_TableData *rel, RID id, Record *record)
+This function gets the record according to the RID and store the record data into the parameter record.
+
+startScan(RM_TableData *rel, RM_ScanHandle *scan, Expr *cond)
+This function initializes a scan request.
+
+next(RM_ScanHandle *scan, Record *record)
+This function is used to iterate the database to find all tuples satisfying the scanning condition and get the next eligible record in the table. There are many edge cases, such as reaching the end of the database, reaching the end of one page file and the scan condition.
+
+closeScan(RM_ScanHandle *scan)
+This function frees scan handler
+
+getRecordSize(Schema *schema)
+This function counts the size of the record based on the schema.
+
+*createSchema(int numAttr, char **attrNames, DataType *dataTypes, int *typeLength, int keySize, int *keys)
+This function creates a new schema with all the input data.
+
+freeSchema(Schema *schema)
+This function frees all the memory assigned to schema.
+
+createRecord(Record **record, Schema *schema)
+This function allocates memory for record and record data for creating a new record.
+
+freeRecord(Record *record)
+This function frees the memory space allocated to record.
+
+getAttr(Record *record, Schema *schema, int attrNum, Value **value)
+This funtion is used to get the value of the deisred attribute in the given record. We firstly get the offset of the pointer position according to the given attribute position and previous attributes' data size. Then starting from the offset stores the value of the desired attribute and we just copy it from the memory and assign it to the parameter value.
+
+setAttr(Record *record, Schema *schema, int attrNum, Value *value)
+This function is sets the value for the given attrNum attribute in record. we find the location storing the desired attribute's value and update the attribute value based on the given value parameter.
+
+
+
+
+OPTIONAL EXTENSIONS:
+
+checkDuplicatePrimaryKey(RM_TableData *rel, Record *record)
+This function is used by insertRecord() and updateRecord() functions to check if there exists a record with the same primary key.
+We added another testfile test_assign3_2.c for duplicate inserts and duplicate updates error test.
+
+updateScan(RM_TableData *rel,  Expr *cond, void (*updateFunction)(RM_TableData *table, Schema *schema, Record *record))
+This function is used to perform conditional updates. The cond specifies the condition and updateFunction is a pointer to a function that modifies the records with matching conditions. The updateFunction must be passed by the client.
+The testcases for this function are in test_assign_3_3.c.
